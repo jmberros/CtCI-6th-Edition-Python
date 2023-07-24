@@ -1,24 +1,32 @@
 from typing import List
+from typing import Optional
 
 
 class LinkedListNode:
     def __init__(self, value: int):
         self.value = value
         self.next = None
-        # self.prev = None
+        self.prev = None
 
     def __repr__(self):
-        return str(self.value)
-
-    def __eq__(self, other):
-        if isinstance(other, int):
-            return self.value == other
-        else:
-            return self.value == other.value
+        rep = str(self.value)
+        if self.prev is not None:
+            rep = ":" + rep
+        if self.next is not None:
+            rep += ":"
+        return rep
 
 
 class LinkedList:
-    def __init__(self, values: List[int] = None):
+    # TODO Docstring to the class and to all methods
+
+    @staticmethod
+    def merge(left, right):
+        left.tail.next = right.head
+        right.head.prev = left.tail
+        return left
+
+    def __init__(self, *values: List[int]):
         self.head = None
         self.tail = None
 
@@ -34,13 +42,14 @@ class LinkedList:
 
     def __len__(self):
         return sum(1 for node in self)
-                
+        
     def add(self, value: int):
         n = LinkedListNode(value)
         if self.head is None:
             self.head = self.tail = n
         else:
             self.tail.next = n
+            n.prev = self.tail
             self.tail = n
 
     def delete(self, value: int):
@@ -57,13 +66,53 @@ class LinkedList:
                 n.next = n.next.next  # Skip a node
             n = n.next
 
+    def find(self, value: int) -> Optional[LinkedListNode]:
+        for node in self:
+            if node.value == value:
+                return node
+
+    def move_node_to_head(self, node: LinkedListNode):
+        if self.head is None:
+            self.add(node)
+            return
+        elif self.head == node:
+            return
+        
+        if node.prev is not None:
+            node.prev.next = node.next
+        if node.next is not None:
+            node.next.prev = node.prev
+
+        node.prev = None
+        node.next = self.head
+
+        self.head.prev = node
+        self.head = node
+
+    def prepend(self, value: int):
+        self.move_node_to_head(LinkedListNode(value))
+
+    def reverse_iter(self):
+        current = self.tail
+        while current is not None:
+            yield current
+            current = current.prev
+
+    def reverse(self):
+        current = self.tail
+        while current:
+            current.next, current.prev = current.prev, current.next
+            current = current.next
+
+        self.tail, self.head = self.head, self.tail
+
     def __repr__(self):
         n = self.head
         values = []
         while n is not None:
             values.append(str(n))
             n = n.next
-        return "LinkedList(" + "-".join(values) + ")"
+        return "LinkedList(" + "".join(values) + ")"
 
     def __eq__(self, other):
         return str(self) == str(other)  # Hack
