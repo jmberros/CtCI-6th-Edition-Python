@@ -1,5 +1,6 @@
 from typing import List
 from typing import Optional
+from collections.abc import Iterable
 
 
 class LinkedListNode:
@@ -30,6 +31,9 @@ class LinkedList:
         self.head = None
         self.tail = None
 
+        if len(values) == 1 and isinstance(values[0], Iterable):
+            values = values[0]
+
         if values:
             for value in values:
                 self.add(value)
@@ -42,6 +46,12 @@ class LinkedList:
 
     def __len__(self):
         return sum(1 for node in self)
+
+    def is_empty(self):
+        return self.head is None and self.tail is None
+
+    def one_item_list(self):
+        return self.head == self.tail
         
     def add(self, value: int):
         n = LinkedListNode(value)
