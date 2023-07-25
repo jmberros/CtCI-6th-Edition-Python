@@ -122,6 +122,8 @@ class LinkedList:
         while n is not None:
             values.append(str(n))
             n = n.next
+            if len(values) > 20:  # Guard for circularities
+                break
         return "LinkedList(" + "".join(values) + ")"
 
     def __eq__(self, other):
